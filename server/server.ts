@@ -21,7 +21,7 @@ const app = express();
 
 
 app.use(cors({
-    origin: ['http://localhost:5173', 'http://localhost:3000', "https://thumblify-5fj3.vercel.app" ],
+    origin: ['http://localhost:5173', 'http://localhost:3000'],
     credentials: true
 }))
 app.use(session({
@@ -30,10 +30,6 @@ app.use(session({
     saveUninitialized: false,
     cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 7,
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'none',
-        path: '/'
 }, 
     store: MongoStore.create({
         mongoUrl: process.env.MONGODB_URI as string,
