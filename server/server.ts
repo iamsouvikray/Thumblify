@@ -7,7 +7,7 @@ import MongoStore from 'connect-mongo';
 
 import AuthRouter from './routes/AuthRoutes.js';
 import ThumbnailRouter from './routes/ThumbnailRoutes.js';
-import UserRouter from './routes/UserRoutes.js';
+import UserRouter from './routes/UserRoutes.js'; 
 
 declare module 'express-session' {
   interface SessionData {
