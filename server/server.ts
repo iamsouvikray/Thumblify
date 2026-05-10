@@ -20,30 +20,36 @@ await connectDB();
 
 const app = express();
 
+app.set('trust proxy', 1);
+
 app.use(cors({
   origin: [
     'http://localhost:5173',
     'http://localhost:5174',
     'http://localhost:3000',
-    'https://thumblify-2sne.vercel.app'
+     'https://thumblify-server-self-three.vercel.app'
   ],
   credentials: true
 }));
+
+app.use(express.json());
 
 app.use(session({
   secret: process.env.SESSION_SECRET as string,
   resave: false,
   saveUninitialized: false,
+
   cookie: {
     maxAge: 1000 * 60 * 60 * 24 * 7,
+    secure: true,
+    sameSite: 'none'
   },
+
   store: MongoStore.create({
     mongoUrl: process.env.MONGODB_URI as string,
     collectionName: 'sessions'
   })
 }));
-
-app.use(express.json());
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Server is Live!');
