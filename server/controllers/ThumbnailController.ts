@@ -4,6 +4,9 @@ import Thumbnail from "../models/ThumbnailModel.js";
 
 export const generateThumbnail = async (req: Request, res: Response) => {
   try {
+
+    console.log("🔥 Thumbnail API HIT");
+
     const {
       title,
       prompt,
@@ -13,11 +16,13 @@ export const generateThumbnail = async (req: Request, res: Response) => {
       text_overlay
     } = req.body;
 
-    // ✅ SAFETY CHECK (prevents 500 crash)
-    if (!req.session.userId) {
+    // ✅ SAFE SESSION CHECK (prevents crash on Vercel)
+    const userId = req.session?.userId;
+
+    if (!userId) {
       return res.status(401).json({
         success: false,
-        message: "Not authenticated"
+        message: "Unauthorized user"
       });
     }
 
@@ -39,9 +44,9 @@ export const generateThumbnail = async (req: Request, res: Response) => {
       }
     );
 
-    console.log("RAPID API RESPONSE:", response.data);
+    console.log("RAPID RESPONSE:", response.data);
 
-    // ✅ FIXED IMAGE EXTRACTION (YOUR REAL ISSUE)
+    // ✅ SAFE IMAGE EXTRACTION (FIXED)
     const imageUrl =
       response.data?.final_result?.[0]?.origin ||
       response.data?.final_result?.[0]?.thumb;
@@ -49,13 +54,13 @@ export const generateThumbnail = async (req: Request, res: Response) => {
     if (!imageUrl) {
       return res.status(500).json({
         success: false,
-        message: "No image returned from AI API"
+        message: "Image not generated from API"
       });
     }
 
-    // 💾 SAVE TO DB
+    // 💾 SAVE TO DATABASE
     const thumbnail = await Thumbnail.create({
-      userId: req.session.userId,
+      userId,
       title,
       user_prompt: prompt,
       style,
@@ -73,30 +78,35 @@ export const generateThumbnail = async (req: Request, res: Response) => {
     });
 
   } catch (error: any) {
-    console.log("FULL ERROR:", error?.response?.data || error.message);
+
+    console.log("❌ FULL ERROR:", error?.response?.data || error.message);
 
     return res.status(500).json({
       success: false,
-      message: error?.response?.data?.message || "Generation failed"
+      message: "Server error while generating thumbnail"
     });
   }
 };
 
 export const deleteThumbnail = async (req: Request, res: Response) => {
   try {
+
     const { id } = req.params;
 
     await Thumbnail.findByIdAndDelete(id);
 
     return res.json({
       success: true,
-      message: "Thumbnail deleted"
+      message: "Thumbnail deleted successfully"
     });
 
   } catch (error: any) {
+
+    console.log(error);
+
     return res.status(500).json({
       success: false,
-      message: error.message
+      message: "Delete failed"
     });
   }
 };
