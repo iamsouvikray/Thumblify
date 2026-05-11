@@ -27,16 +27,6 @@ A modern TypeScript-based web application to generate, preview, and manage high-
 
 ---
 
-# 📸 Screenshots
-
-Add project screenshots here for better GitHub presentation.
-
-```md id="pld6do"
-![Homepage](./screenshots/home.png)
-```
-
----
-
 # 📂 Installation
 
 Clone the repository:
