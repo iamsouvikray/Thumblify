@@ -21,16 +21,11 @@ await connectDB();
 
 const app = express();
 
-// IMPORTANT FOR VERCEL / RENDER
+// IMPORTANT FOR VERCEL
 app.set('trust proxy', 1);
 
 app.use(cors({
-  origin: [
-    'http://localhost:5173',
-    'http://localhost:5174',
-    'http://localhost:3000',
-    'https://thumblify-myeh.vercel.app'
-  ],
+  origin: 'https://thumblify-myeh.vercel.app',
   credentials: true
 }));
 
@@ -42,33 +37,27 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
 
-  cookie: {
-    maxAge: 1000 * 60 * 60 * 24 * 7,
-    httpOnly: true,
-
-    // IMPORTANT FOR PRODUCTION
-    secure: process.env.NODE_ENV === 'production',
-
-    // IMPORTANT FOR CROSS DOMAIN
-    sameSite:
-      process.env.NODE_ENV === 'production'
-        ? 'none'
-        : 'lax',
-
-    path: '/'
-  },
-
   store: MongoStore.create({
     mongoUrl: process.env.MONGODB_URI as string,
     collectionName: 'sessions'
-  })
+  }),
+
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24 * 7,
+
+    httpOnly: true,
+
+    secure: true,
+
+    sameSite: 'none'
+  }
 }));
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Server is Live!');
 });
 
-// RAPID API ROUTE
+// RAPID API IMAGE GENERATION
 app.post('/api/generate-image', async (req: Request, res: Response) => {
 
   try {
@@ -117,7 +106,5 @@ app.use('/api/user', UserRouter);
 const port = process.env.PORT || 5000;
 
 app.listen(port, () => {
-  console.log(
-    `Server is running at http://localhost:${port}`
-  );
+  console.log(`Server is running at http://localhost:${port}`);
 });
